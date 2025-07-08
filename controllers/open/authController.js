@@ -40,38 +40,48 @@ console.log('🔍 Identity password:', password);
       });
     }
 
-    req.session.user = {
-      id: user._id,
-      roler: user.roler
-    };
+   req.session.user = {
+  id: user._id,
+  roler: user.roler
+};
 
-    if (remember === 'on') {
-      req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
-    } else {
-      req.session.cookie.expires = false;
-    }
+if (remember === 'on') {
+  req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+} else {
+  req.session.cookie.expires = false;
+}
 
-
-    let redirectUrl;
-
-    if (user.roler === 'superadmin') {
-      redirectUrl = '/superadmin';
-    } else if (user.roler === 'admin') {
-      redirectUrl = '/admin';
-    } else if (user.roler === 'ordinary') {
-      redirectUrl = '/ordinary';
-    } else {
-      console.warn('⚠️ Unknown role:', user.roler);
-      return res.status(400).json({
-        success: false,
-        message: `Unexpected role: ${user.roler}`
-      });
-    }
-
-    return res.json({
-      success: true,
-      redirectUrl
+// 🛠️ SAVE SESSION BEFORE RESPONDING
+req.session.save((err) => {
+  if (err) {
+    console.error('Session save error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Session could not be saved'
     });
+  }
+
+  let redirectUrl;
+
+  if (user.roler === 'superadmin') {
+    redirectUrl = '/superadmin';
+  } else if (user.roler === 'admin') {
+    redirectUrl = '/admin';
+  } else if (user.roler === 'ordinary') {
+    redirectUrl = '/ordinary';
+  } else {
+    console.warn('⚠️ Unknown role:', user.roler);
+    return res.status(400).json({
+      success: false,
+      message: `Unexpected role: ${user.roler}`
+    });
+  }
+
+  return res.json({
+    success: true,
+    redirectUrl
+  });
+});
 
 
   } catch (err) {
