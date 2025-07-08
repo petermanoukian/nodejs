@@ -109,16 +109,22 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/express_aut
 
 connectDB();
 
+const mongoClientPromise = new Promise((resolve) => {
+  mongoose.connection.once('connected', () => {
+    resolve(mongoose.connection.getClient());
+  });
+});
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'NOuD-GSH32',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI || 'mongodb+srv://bediktest:psrdmquVBDYpoaL7@cluster0.xrmcva2.mongodb.net/express_auth?retryWrites=true&w=majority',
+    clientPromise: mongoClientPromise,
     dbName: 'express_auth',
     collectionName: 'sessions',
-    ttl: 30 * 24 * 60 * 60 // 30 days
+    ttl: 30 * 24 * 60 * 60
   }),
   cookie: {
     secure: false,
@@ -126,6 +132,7 @@ app.use(session({
     maxAge: 30 * 24 * 60 * 60 * 1000
   }
 }));
+
 
 
 
