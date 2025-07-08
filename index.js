@@ -74,7 +74,7 @@ connectDB().then(() => {
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,
+      mongoUrl: process.env.MONGO_URI || 'mongodb+srv://bediktest:psrdmquVBDYpoaL7@cluster0.xrmcva2.mongodb.net/express_auth?retryWrites=true&w=majority',
       dbName: 'express_auth',
       collectionName: 'sessions',
       ttl: 30 * 24 * 60 * 60 // 30 days
