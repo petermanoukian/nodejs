@@ -115,18 +115,15 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,        // from your .env
-    dbName: 'express_auth',                 // your target DB
-    collectionName: 'sessions',             // where session data lives
-    ttl: 30 * 24 * 60 * 60,                 // 30 days
-    crypto: {
-      secret: 'encryptSessionSecretHere'    // optional encryption
-    }
+    mongoUrl: process.env.MONGO_URI, // ✅ this is the fix
+    dbName: 'express_auth',
+    collectionName: 'sessions',
+    ttl: 30 * 24 * 60 * 60
   }),
   cookie: {
-    secure: false,                          // set to true if using HTTPS
+    secure: false,
     httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000        // 30 days
+    maxAge: 30 * 24 * 60 * 60 * 1000
   }
 }));
 
