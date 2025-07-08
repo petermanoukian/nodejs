@@ -18,6 +18,9 @@ const processSignin = async (req, res) => {
   try {
     const { identity, password, remember } = req.body;
 
+console.log('🔍 Identity received:', identity);
+console.log('🔍 Identity password:', password);
+
     const user = await User.findOne({
       $or: [{ email: identity }, { username: identity }]
     });
