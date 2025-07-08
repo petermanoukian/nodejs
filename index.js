@@ -109,6 +109,28 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/express_aut
 
 connectDB();
 
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'NOuD-GSH32',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,        // from your .env
+    dbName: 'express_auth',                 // your target DB
+    collectionName: 'sessions',             // where session data lives
+    ttl: 30 * 24 * 60 * 60,                 // 30 days
+    crypto: {
+      secret: 'encryptSessionSecretHere'    // optional encryption
+    }
+  }),
+  cookie: {
+    secure: false,                          // set to true if using HTTPS
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000        // 30 days
+  }
+}));
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
