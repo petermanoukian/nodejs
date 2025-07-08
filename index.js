@@ -7,7 +7,10 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 //const hbs = require('hbs');
 const exphbs = require('express-handlebars');
-const connectDB = require('./config/db');
+
+
+const { connectDB, mongoose } = require('./config/db');
+
 const app = express();
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
@@ -97,7 +100,7 @@ app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views')); // Already set most likely
 const port = 3000;
 
-const mongoose = require('mongoose');
+
 
 /*
 //const mongoose = require('mongoose');
@@ -107,40 +110,26 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/express_aut
   .catch((err) => console.error('MongoDB connection error:', err));
 */
 
-connectDB();
+connectDB().then(() => {
+  const client = mongoose.connection.getClient();
 
-const mongoClientPromise = new Promise((resolve, reject) => {
-  mongoose.connection.once('connected', () => {
-    try {
-      const client = mongoose.connection.getClient();
-      resolve(client);
-    } catch (err) {
-      reject(err);
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'NOuD-GSH32',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      client,
+      dbName: 'express_auth',
+      collectionName: 'sessions',
+      ttl: 30 * 24 * 60 * 60,
+    }),
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000
     }
-  });
-});
-
-
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'NOuD-GSH32',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    clientPromise: mongoClientPromise,
-    dbName: 'express_auth',
-    collectionName: 'sessions',
-    ttl: 30 * 24 * 60 * 60
-  }),
-  cookie: {
-    secure: false,
-    httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000
-  }
-}));
-
-
-
+  }));
+app.use(flash());
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -148,22 +137,7 @@ app.use(express.json());
 
 app.use(methodOverride('_method'));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'NOuD-GSH32',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    client: mongoose.connection.getClient(),
-    ttl: 30 * 24 * 60 * 60
-  }),
-  cookie: {
-    secure: false,
-    httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000
-  }
-}));
 
-app.use(flash());
 app.use(function (req, res, next) {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
