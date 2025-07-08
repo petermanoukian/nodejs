@@ -1,0 +1,155 @@
+<!-- views/superadmin/editUser.handlebars -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Edit User   </h2>
+
+      <form action="/superadmin/user/update/{{userIdx}}?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT" />
+        <div class="mb-3">
+          <label for="fullName" class="form-label">Full Name</label>
+          <input type="text" name="fullName" id="fullName" class="form-control" 
+          value="{{userx.fullName}}" required />
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" id="email" class="form-control" value="{{userx.email}}" required />
+          <div id="emailFeedback" class="form-text text-danger"></div>
+        </div>
+
+        <!-- Username -->
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" name="username" id="username" class="form-control" 
+          value="{{userx.username}}" required />
+          <div id="usernameFeedback" class="form-text text-danger"></div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Password (leave blank to keep current)</label>
+          <input type="password" name="password" id="password" class="form-control" />
+          <div id="passwordFeedback" class="form-text text-danger"></div>
+        </div>
+
+        <!-- Role -->
+        <div class="mb-3">
+          <label for="roler" class="form-label">Role</label>
+            <select name="roler" id="roler" class="form-select" required>
+            <option value="ordinary" {{#ifEquals userx.roler "ordinary"}}selected{{/ifEquals}}>Ordinary</option>
+            <option value="admin" {{#ifEquals userx.roler "admin"}}selected{{/ifEquals}}>Admin</option>
+            <option value="superadmin" {{#ifEquals userx.roler "superadmin"}}selected{{/ifEquals}}>Superadmin</option>
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+          <label for="img" class="form-label">Profile Image</label>
+          <input type="file" name="img" id="img" class="form-control" accept=".jpg,.jpeg,.png,.gif" />
+
+          <div class="mt-2" id="preview-wrapper">
+            {{#if userx.img.thumbnail}}
+              <label class="form-label">Current Profile Image</label><br />
+              <a href="/uploads/{{userx.img.large}}" target="_blank">
+                <img id="preview" src="/uploads/{{userx.img.thumbnail}}" alt="Current Image"
+                    style="max-width: 150px; border-radius: 8px;" />
+              </a>
+            {{else}}
+              <img id="preview" src="#" alt="Preview will appear here"
+                  style="max-width: 150px; border-radius: 8px; display: none;" />
+            {{/if}}
+          </div>
+        </div>
+
+
+      
+        <div class="mb-3">
+          <label for="filer" class="form-label">Optional Document</label>
+          <input type="file" name="filer" id="filer" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt" />
+        </div>
+
+        {{#if userx.filer}}
+            <div class="mb-3">
+                <label class="form-label">Current Document</label><br />
+                <a href="/uploads/{{userx.filer}}" target="_blank">{{userx.filer}}</a>
+            </div>
+        {{/if}}
+         <div class="mb-3 text-center">
+          <button type="submit" class="btn btn-success mb-4 max400 text-center" id="editBtn" disabled>
+            Update User</button>
+         </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#section "scripts"}}
+<script>
+$(document).ready(function () {
+  const $email = $('#email');
+  const $username = $('#username');
+  const $password = $('#password');
+  const $btn = $('#editBtn');
+  const userIdx = '{{userIdx}}';
+
+  let emailValid = true;
+  let usernameValid = true;
+
+  function toggleEditButton() {
+    $btn.prop('disabled', !(emailValid && usernameValid));
+  }
+
+  function validateFields() {
+    const email = $email.val().trim();
+    const username = $username.val().trim();
+
+    $.post(`/superadmin/validate-user-edit/${userIdx}`, { email, username }, function (data) {
+      if (data.emailTaken) {
+        $('#emailFeedback').text('Email is already taken.');
+        emailValid = false;
+      } else {
+        $('#emailFeedback').text('');
+        emailValid = true;
+      }
+
+      if (data.usernameTaken) {
+        $('#usernameFeedback').text('Username is already taken.');
+        usernameValid = false;
+      } else {
+        $('#usernameFeedback').text('');
+        usernameValid = true;
+      }
+
+      toggleEditButton();
+    });
+  }
+
+  $email.on('blur', validateFields);
+  $username.on('blur', validateFields);
+
+  // 💡 Don't disable the button at load
+  $btn.prop('disabled', false);
+});
+
+
+
+  const imgInput = document.getElementById('img');
+  const preview = document.getElementById('preview');
+
+  imgInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+{{/section}}

@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Add category</h2>
+      <form action="/superadmin/cat/add" method="POST" >
+        <div class="mb-3">
+          <label for="name" class="form-label">Title</label>
+          <input type="text" name="name" id="name" class="form-control" required />
+          <div id="nameFeedback" class="form-text text-danger"></div>
+        </div>
+        <div class ='center'>
+          <button type="submit" class="btn btn-primary mb-4" id="addBtn" >Add </button>
+        </div>
+        
+      </form>
+    </div> 
+  </div> 
+</div>
+{{#section "scripts"}}
+<script>
+$(document).ready(function () 
+{
+  const $name = $('#name');
+  const $btn = $('#addBtn');
+  let nameValid = false;
+  function toggleAddButton() 
+  {
+    $btn.prop('disabled', !(nameValid));
+  }
+
+  function validateFields() 
+  {
+    const namex = $name.val().trim();
+    $.post('/superadmin/cat/validate-cat', { name:namex }, function (data) {
+      if (data.nameTaken) {
+        $('#nameFeedback').text('Already taken.');
+        nameValid = false;
+      } 
+      else 
+      {
+        $('#nameFeedback').text('');
+        nameValid = true;
+      }
+      toggleAddButton();
+    });
+  }
+  $name.on('blur', validateFields);
+});
+</script>
+{{/section}}

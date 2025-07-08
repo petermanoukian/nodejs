@@ -1,0 +1,102 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.css" rel="stylesheet" />
+<style>
+
+
+
+</style>
+
+{{/section}}
+
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Add Subcategory</h2>
+      <form action="/superadmin/subcat/add" method="POST">
+        <div class="mb-3">
+
+          <label for="catid" >Category</label>
+          <div class=" mt-2 ">
+          <select name="catid" id="catid" class="form-control searchable-cat" required>
+            {{#each cats}}
+              <option value="{{this._id}}" {{#ifEquals this._id ../catid}}selected{{/ifEquals}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+          </div>
+
+        </div>
+
+        <div class="mb-3">
+          <label for="name" class="form-label">Subcategory</label>
+          <input type="text" name="name" id="name" class="form-control" required />
+          <div id="nameFeedback" class="form-text text-danger"></div>
+        </div>
+        <div class ='center'>
+          <button type="submit" class="btn btn-primary mb-4 max400 center" id="addBtn" >Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#section "scripts"}}
+
+
+<script>
+$(document).ready(function () {
+  const $name = $('#name');
+  const $catid = $('#catid');
+  const $btn = $('#addBtn');
+  const $feedback = $('#nameFeedback');
+
+    $catid.select2({
+    placeholder: 'Select a category',
+    allowClear: true,
+    width: '90%',
+    
+  });
+
+  let nameValid = false;
+
+  function toggleAddButton() {
+    $btn.prop('disabled', !nameValid);
+  }
+
+  function validate() {
+    const name = $name.val().trim();
+    const catid = $catid.val();
+
+    if (!name || !catid) {
+      $feedback.text('');
+      nameValid = false;
+      toggleAddButton();
+      return;
+    }
+
+    $.post('/superadmin/subcat/validate', { name, catid }, function (data) {
+      if (data.nameTaken) {
+        $feedback.text('Name is already taken under this category.');
+        nameValid = false;
+      } else {
+        $feedback.text('');
+        nameValid = true;
+      }
+      toggleAddButton();
+    });
+  }
+
+  $name.on('input blur', validate);
+  $catid.on('change', validate);
+
+
+
+
+
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+{{/section}}

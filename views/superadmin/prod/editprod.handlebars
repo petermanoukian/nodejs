@@ -1,0 +1,248 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+<style>
+</style>
+
+{{/section}}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Edit Product</h2>
+
+      <form action="/superadmin/prod/update/{{prod._id}}?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT" />
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label for="catid">Category</label>
+            <select name="catid" id="catid" class="form-control searchable-cat" required>
+              <option value="">Choose Category</option>
+              {{#each cats}}
+                 <option value="{{this._id}}" {{#ifEquals this._id ../prod.catid}}selected{{/ifEquals}}>
+                  {{this.name}} 
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="subcatid">Subcategory</label>
+            <select name="subcatid" id="subcatid" class="form-control searchable-subcat" required>
+              <option value="">Choose Subcategory</option>
+              {{#each subcats}}
+                <option value="{{this._id}}" {{#ifEquals this._id ../prod.subcatid}}selected{{/ifEquals}}>
+                  {{this.name}} 
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+
+
+        <div class="mb-3">
+          <label for="taggs">Tags</label>
+          <select name="taggs[]" id="taggs" class="form-control searchable-taggs" multiple required>
+            {{#each taggs}}
+              <option value="{{this._id}}" {{#if (includes ../selectedTaggs this._id)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label for="name">Product Name</label>
+            <input type="text" name="name" id="name" class="form-control" required value="{{prod.name}}" />
+            <div id="nameFeedback" class="form-text text-danger"></div>
+          </div>
+          <div class="col-md-6">
+            <label for="coder">Product Code</label>
+            <input type="text" name="coder" id="coder" class="form-control" required value="{{prod.coder}}" />
+            <div id="coderFeedback" class="form-text text-danger"></div>
+          </div>
+        </div>
+
+        <div class="mb-1">
+          <label for="des">Short Description</label>
+          <textarea name="des" id="des" class="form-control textaerashort1">{{prod.des}}</textarea>
+        </div>
+
+        <div class="mb-1">
+          <label for="dess">Long Description</label>
+          <textarea name="dess" id="dess" class="minheight250" rows="5">{{prod.dess}}</textarea>
+        </div>
+
+        <div class="mb-1">
+          <label for="prix">Price</label>
+          <input type="number" name="prix" id="prix" class="form-control" min="0" step="0.01" required 
+          value="{{prod.prix}}" />
+        </div>
+
+        <div class="mb-2">
+          <label for="img">Main Image 
+
+            {{prod.name}}
+          </label>
+          <input type="file" name="img" id="img" class="form-control" accept="image/*" />
+                    <div class="mt-2" id="preview-wrapper">
+            {{#ifBoth prod.img.thumbnail prod.img.large}}
+              <label class="form-label">Current Profile Image</label><br />
+              <a href="/uploads/{{prod.img.large}}" target="_blank">
+                <img id="preview" src="/uploads/{{prod.img.thumbnail}}" alt="Current Image"
+                style="max-width: 150px; border-radius: 8px;" />
+              </a>
+            {{else}}
+              <img id="preview" src="#" alt="Preview will appear here"
+                  style="max-width: 150px; border-radius: 8px; display: none;" />
+           {{/ifBoth}}
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label for="filer">Additional File</label>
+          <input type="file" name="filer" id="filer" class="form-control" />
+          {{#if prod.filer}}
+            <div class="mt-2">
+              <a href="/uploads/{{prod.filer}}" target="_blank">View Existing File</a>
+            </div>
+          {{/if}}
+        </div>
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label for="ordd">Order</label>
+            <input type="number" name="ordd" id="ordd" class="form-control" min="1" step="1" value="{{prod.ordd}}" />
+          </div>
+          <div class="col-md-6">
+            <div class="row">
+              <label>Visible</label>
+              <div class="col-md-5">
+                <input class="form-check-input" type="radio" name="vis" id="visibleYes" value="1" {{#ifEquals prod.vis 1}}checked{{/ifEquals}}>
+                <label class="form-check-label" for="visibleYes">Yes</label>
+              </div>
+              <div class="col-md-5">
+                <input class="form-check-input" type="radio" name="vis" id="visibleNo" value="0" {{#ifEquals prod.vis 0}}checked{{/ifEquals}}>
+                <label class="form-check-label" for="visibleNo">No</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="center">
+          <button type="submit" class="btn btn-primary mb-4 max400 center" id="editBtn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{#section "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    const $catid = $('#catid');
+    const $subcatid = $('#subcatid');
+    const $taggsWrapper = $('#taggs');
+    const $name = $('#name');
+    const $coder = $('#coder');
+    const $nameFeedback = $('#nameFeedback');
+    const $coderFeedback = $('#coderFeedback');
+
+    const initialCatid = '{{prod.catid}}';
+    const initialSubcatid = '{{prod.subcatid}}';
+    const initialName = '{{prod.name}}';
+    const initialCoder = '{{prod.coder}}';
+
+    $catid.select2({ placeholder: 'Choose Category', width: '100%' });
+    $subcatid.select2({ placeholder: 'Choose Subcategory', width: '100%' });
+    $taggsWrapper.select2({ placeholder: 'Tags', width: '100%' });
+
+    function updateSubcategories() {
+      const catid = $catid.val();
+      $.get(`/superadmin/subcat/api/subcats/${catid}`, function (options) {
+        $subcatid.empty().append('<option value="">Choose Subcategory</option>');
+        options.forEach(opt => {
+          const selected = (opt._id === initialSubcatid) ? 'selected' : '';
+          $subcatid.append(`<option value="${opt._id}" ${selected}>${opt.name}</option>`);
+        });
+        $subcatid.val(initialSubcatid).trigger('change');
+      });
+    }
+
+    $catid.on('change', updateSubcategories);
+    updateSubcategories();
+
+    function checkedots() {
+      const name = $name.val().trim();
+      const coder = $coder.val().trim();
+      const catid = $catid.val();
+      const subcatid = $subcatid.val();
+
+      if (name && (name !== initialName)) {
+        $.post('/superadmin/prod/validate', { name, catid, subcatid }, function (data) {
+          $nameFeedback.text(data.nameTaken ? 'Name is already used under this category/subcategory.' : '');
+        });
+      } else {
+        $nameFeedback.text('');
+      }
+
+      if (coder && (coder !== initialCoder)) {
+        $.post('/superadmin/prod/validate-coder', { coder }, function (data) {
+          $coderFeedback.text(data.coderTaken ? 'This code is already taken.' : '');
+        });
+      } else {
+        $coderFeedback.text('');
+      }
+    }
+
+    $name.on('input blur change', checkedots);
+    $coder.on('input blur change', checkedots);
+    $catid.on('change', checkedots);
+    $subcatid.on('change', checkedots);
+  });
+
+  const imgInput = document.getElementById('img');
+  const preview = document.getElementById('preview');
+
+  if (imgInput && preview) {
+    imgInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  ClassicEditor
+    .create(document.querySelector('#dess'), {
+      toolbar: [
+        'heading', '|',
+        'bold', 'italic', 'underline', 'strikethrough', '|',
+        'link', 'blockQuote', '|',
+        'bulletedList', 'numberedList', '|',
+        'undo', 'redo'
+      ]
+    })
+    .then(editor => {
+      editor.ui.view.editable.element.style.minHeight = '250px';
+    })
+    .catch(error => {
+      console.error('🛠️ CKEditor init error:', error);
+    });
+</script>
+{{/section}}

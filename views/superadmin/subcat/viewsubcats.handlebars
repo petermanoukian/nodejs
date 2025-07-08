@@ -1,0 +1,241 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <style>
+    .select2-container--default .select2-selection--single {
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      height: 38px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+    }
+    .select2-selection__rendered {
+      overflow: visible !important;
+      white-space: nowrap;
+    }
+    .select2-container--open {
+      z-index: 9999 !important;
+    }
+
+    .select2-selection__rendered {
+        text-align: left !important;
+        direction: ltr !important;
+      }
+
+      body .select2-container .select2-selection__rendered {
+        text-align: left !important;
+        direction: ltr !important;
+      }
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+  float: none !important;
+  text-align: left !important;
+  direction: ltr !important;
+  line-height: 28px;
+  padding-left: 8px;
+}
+
+/* Scoped fix only for .searchable-cat */
+.searchable-cat + .select2-container .select2-selection__rendered {
+  float: none !important;
+  text-align: left !important;
+  direction: ltr !important;
+  padding-left: 8px;
+  padding-right: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  line-height: 36px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__clear {
+  position: absolute;
+  right: 8px;
+  top: 10%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #666;
+  display:none;
+}
+.select2-container--open {
+  z-index: 9999 !important;
+}
+
+.select2-selection__arrow {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+  </style>
+{{/section}}
+
+<h2 class="mb-4">Subcategories</h2>
+
+{{#if success_msg}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{success_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+{{#if error_msg}}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{error_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+<form method="GET" class="row g-2 align-items-center mb-4">
+  <div class="col-md-4">
+    <input type="text" name="q" value="{{searchQuery}}" placeholder="Search by name" class="form-control" />
+  </div>
+  <div class="col-md-4">
+    <select name="catid" id="catid" class="form-select searchable-cat">
+      <option value="">All Categories</option>
+      {{#each cats}}
+        <option value="{{this._id}}" {{#ifEquals ../catid this._id}}selected{{/ifEquals}}>{{this.name}}</option>
+      {{/each}}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+  </div>
+</form>
+
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+      <th><input type="checkbox" id="selectAll" class="form-check-input" /></th>
+      <th>
+        <a href="?sort=_id&dir={{toggleDir sortField sortDir '_id'}}&q={{searchQuery}}&catid={{catid}}">
+          Created
+          {{#ifEquals sortField "_id"}}
+            {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+          {{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=name&dir={{toggleDir sortField sortDir 'name'}}&q={{searchQuery}}&catid={{catid}}">
+          Name
+          {{#ifEquals sortField "name"}}
+            {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+          {{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=catid&dir={{toggleDir sortField sortDir 'catid'}}&q={{searchQuery}}&catid={{catid}}">
+          Category
+          {{#ifEquals sortField "catid"}}
+            {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+          {{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each subcats}}
+      <tr>
+        <td><input type="checkbox" name="selected[]" value="{{this._id}}" class="delete-checkbox form-check-input" /></td>
+        <td class="font-12">{{formatShortIdDate this._id}}</td>
+        <td>{{this.name}}</td>
+        <td>{{this.catid.name}}</td>
+        <td>
+
+          <a href="/superadmin/subcat/new/{{this.catid._id}}" class="btn btn-sm btn-outline-secondary me-1">
+            Add Subcategory
+          </a>
+
+          <a href="/superadmin/prod/create/{{this.catid._id}}/{{this._id}}" class="btn btn-sm btn-outline-primary ms-1">
+            Add Product
+          </a>
+
+          <a href="/superadmin/prod/view/{{this.catid._id}}/{{this._id}}" class="btn btn-sm btn-outline-success ms-1">
+            View Products
+            {{#if this.prodCount}} ({{this.prodCount}}) {{else}}  {{/if}}
+          </a>
+
+          <a href="/superadmin/subcat/edit/{{this._id}}" class="btn btn-sm btn-outline-info">Edit</a>
+          <form action="/superadmin/subcat/delete/{{this._id}}?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this?');">
+            <button type="submit" class="btn btn-outline-danger btn-sm p-0 px-2" style="width: 32px;" title="Delete">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<form id="multiDeleteForm" action="/superadmin/subcat/delete-many?_method=DELETE" method="POST" style="display: none;" onsubmit="return confirm('Delete selected subcategories?');">
+  <input type="hidden" name="_method" value="DELETE" />
+  <div id="selectedContainer"></div>
+  <div class="text-center mb-3">
+    <button type="submit" class="btn btn-danger w-50 max400">
+      <i class="bi bi-trash-fill"></i> Delete Selected
+    </button>
+  </div>
+</form>
+
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {{#each (range 1 totalPages)}}
+      <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+        <a class="page-link" href="?page={{this}}&q={{../searchQuery}}&catid={{../catid}}&sort={{../sortField}}&dir={{../sortDir}}">{{this}}</a>
+      </li>
+    {{/each}}
+  </ul>
+</nav>
+
+{{#section "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.searchable-cat').select2({
+      placeholder: 'Filter by category',
+      allowClear: true,
+      width: '100%'
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const checkboxes = document.querySelectorAll('.delete-checkbox');
+    const form = document.getElementById('multiDeleteForm');
+    const container = document.getElementById('selectedContainer');
+    const selectAll = document.getElementById('selectAll');
+
+    function updateForm() {
+      container.innerHTML = '';
+      const selectedIds = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      if (selectedIds.length > 0) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'selectedfinal';
+        input.value = selectedIds.join(',');
+        container.appendChild(input);
+        form.style.display = 'block';
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', () => {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        updateForm();
+      });
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateForm));
+  });
+</script>
+{{/section}}

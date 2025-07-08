@@ -1,0 +1,220 @@
+/* public/css/style.css */
+body {
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container {
+  width: 320px;
+  margin: 100px auto;
+  padding: 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+.searchable-cat , .searchable-subcat
+{
+  width:90%;
+}
+
+.searchable-taggs
+{
+  min-height:60px !important;height:60px !important;
+}
+/* 📦 Sleeker tag box styling for .searchable-taggs */
+.searchable-taggs + .select2-container .select2-selection--multiple {
+  border: 1px solid black;
+  min-height: 50px;
+  padding: 4px 8px;
+  line-height: 1.4;
+  border-radius: 4px;
+}
+
+/* 🏷️ Refined tag appearance */
+.searchable-taggs + .select2-container .select2-selection__choice {
+  background-color: #f2f2f2;
+  border: none;
+  padding: 7px 12px !important;min-height: 38px !important;
+  margin: 3px 4px !important;
+  font-size: 1em;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* ❌ Simplified and enlarged close (X) button */
+.searchable-taggs + .select2-container .select2-selection__choice__remove {
+  color: #ff3d3d;
+  font-size: 1.3em;
+  font-weight: bold;
+  padding: 0 8px;
+  margin-right: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute !important;
+  top: 18px !important;
+  right: 10px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+
+
+
+button {
+  width: 70%;max-width:300px;text-align:center;
+
+  padding: 10px;
+  background-color: #745353;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+
+.font-11
+{
+  font-size:11px;
+}
+
+.font-12
+{
+  font-size:12px;
+}
+
+.max400
+{
+  max-width:400px !important;
+}
+
+.center{
+  text-align: center;
+}
+
+.minheight700
+{
+  min-height:700px !important;
+}
+  
+.minheight600
+{
+  min-height:600px !important;
+}
+
+.minheight500
+{
+  min-height:500px !important;
+}
+
+.minheight400
+{
+  min-height:400px !important;
+}
+.minheight300
+{
+  min-height:300px !important;
+}
+.minheight250
+{
+  min-height:250px !important;
+}
+.minheight200
+{
+  min-height:200px !important;
+}
+
+.textaerashort1
+{ 
+  min-height: 160px;
+  padding-top: 12px !important; 
+
+}
+.editor-height + .ck-editor__editable {
+  min-height: 270px !important;
+  max-height: 370px;
+  overflow-y: auto;
+}
+
+
+.select2-container .select2-selection--single {
+  height: 38px;
+  padding: 6px 12px;
+  font-size: 1rem;
+
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+  overflow: visible !important;
+}
+.select2-container--open {
+  z-index: 9999 !important;
+}
+
+/* Make Select2 match your form styling */
+.select2-container--default .select2-selection--single {
+  height: 38px; /* Match your input height */
+  border: 1px solid #ccc; /* Your desired border */
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 16px;
+  box-shadow: none;
+}
+
+/* Remove thick border when dropdown is open/focused */
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default .select2-selection--single:active,
+.select2-container--default .select2-selection--single:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: #66afe9; /* Optional: use your theme color */
+}
+
+/* Make it slightly bigger if needed */
+.select2-selection--single {
+  min-height: 40px;
+}
+
+/* Ensure the 'x' clear button appears to the right */
+.select2-container--default .select2-selection--single .select2-selection__clear {
+  position: absolute;
+  right: 8px;
+  top: 10%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #666;
+  display:none;
+}
+.select2-container--open {
+  z-index: 9999 !important;
+}
+
+.select2-selection__arrow {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+
+
+

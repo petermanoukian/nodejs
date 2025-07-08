@@ -1,0 +1,316 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+<style>
+
+
+</style>
+
+{{/section}}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Add Product</h2>
+
+      <form action="/superadmin/prod/add" method="POST" enctype="multipart/form-data">
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label for="catid">Category</label>
+            <select name="catid" id="catid" class="form-control searchable-cat" required>
+              <option value="">Choose Category</option>
+              {{#each cats}}
+                <option value="{{this._id}}" {{#ifEquals this._id ../catid}}selected{{/ifEquals}}>
+                  {{this.name}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="subcatid">Subcategory</label>
+            <select name="subcatid" id="subcatid" class="form-control searchable-subcat" required>
+              <option value="">Choose Subcategory</option>
+              {{#each subcats}}
+                <option value="{{this._id}}" {{#ifEquals this._id ../subcatid}}selected{{/ifEquals}}>
+                  {{this.name}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+      </div> 
+
+      <div class="mb-3">
+        <label for="taggs">Tags</label>
+        <select name="taggs[]" id="taggs" class="form-control searchable-taggs" multiple>
+          {{#each taggs}}
+            <option value="{{this._id}}" {{#ifEquals this._id ../taggid}}selected{{/ifEquals}}>
+              {{this.name}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label for="name">Product Name</label>
+            <input type="text" name="name" id="name" class="form-control" required />
+            <div id="nameFeedback" class="form-text text-danger"></div>
+          </div>
+          <div class="col-md-6">
+            <label for="coder">Product Code</label>
+            <input type="text" name="coder" id="coder" class="form-control" required />
+            <div id="coderFeedback" class="form-text text-danger"></div>
+          </div>
+        </div>
+
+
+
+
+        <div class="mb-1">
+          <label for="des">Short Description</label>
+          <textarea name="des" id="des" class="form-control textaerashort1"></textarea>
+        </div>
+
+        <div class="mb-1">
+          <label for="dess">Long Description</label>
+          <textarea name="dess" id="dess" class="minheight250" rows = 5></textarea>
+        </div>
+
+        <div class="mb-1">
+          <label for="prix">Price</label>
+          <input type="number" name="prix" id="prix" class="form-control" min="0" step="0.01" required />
+        </div>
+
+        <div class="mb-2">
+          <label for="img">Main Image</label>
+          <input type="file" name="img" id="img" class="form-control" accept="image/*" />
+          <div class="mt-2">
+            <img id="preview" src="#" alt="Preview will appear here" style="max-width: 200px; display: none;" />
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label for="filer">Additional File</label>
+          <input type="file" name="filer" id="filer" class="form-control" />
+        </div>
+
+
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <label for="ordd">Order</label>
+          <input type="number" name="ordd" id="ordd" class="form-control" min="1" step="1" />
+        </div>
+        <div class="col-md-6">
+           <div class="row">
+
+              <label>Visible</label>
+              <div class="col-md-5">
+                <input class="form-check-input" type="radio" name="vis" id="visibleYes" value=1 checked>
+                <label class="form-check-label" for="visibleYes">Yes</label>
+              </div>
+              <div class="col-md-5">
+                <input class="form-check-input" type="radio" name="vis" id="visibleNo" value=0>
+                <label class="form-check-label" for="visibleNo">No</label>
+              </div>
+           </div>
+        </div>
+      </div>
+
+
+      <div class=" center" >
+        <button type="submit" class="btn btn-primary mb-4  max400 center" id="addBtn">Add</button>
+      </div>
+
+        
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#section "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+
+  const presetSubcatId = '{{subcatid}}';
+
+  $(document).ready(function () {
+    const $catid = $('#catid');
+    const $subcatWrapper = $('#subcatWrapper');
+    const $taggsWrapper = $('#taggs');
+    const $subcatid = $('#subcatid');
+    const $productFields = $('#productFields');
+    const $name = $('#name');
+    const $coder = $('#coder');
+    const $nameFeedback = $('#nameFeedback');
+    const $coderFeedback = $('#coderFeedback');
+    const $addBtn = $('#addBtn');
+
+    $catid.select2({ placeholder: 'Choose Category', width: '100%' });
+    $subcatid.select2({ placeholder: 'Choose Subcategory', width: '100%' });
+    $taggsWrapper.select2({ placeholder: 'Tags', width: '100%' });
+
+    function updateSubcategories() {
+      const catid = $catid.val();
+      $.get(`/superadmin/subcat/api/subcats/${catid}`, function (options) {
+        $subcatid.empty().append('<option value="">Choose Subcategory</option>');
+        options.forEach(opt => {
+          const selected = (opt._id === presetSubcatId) ? 'selected' : '';
+          $subcatid.append(`<option value="${opt._id}" ${selected}>${opt.name}</option>`);
+        });
+        $subcatid.val(presetSubcatId).trigger('change');
+      });
+    }
+
+    function validateName() {
+      const name = $name.val().trim();
+      const catid = $catid.val();
+      const subcatid = $subcatid.val();
+      if (!name || !catid || !subcatid) return;
+
+      $.post('/superadmin/prod/validate', { name, catid, subcatid }, function (data) {
+        $nameFeedback.text(data.nameTaken ? 'Name is already used under this category/subcategory.' : '');
+      });
+    }
+
+    function validateCoder() {
+      const coder = $coder.val().trim();
+      if (!coder) return;
+
+      $.post('/superadmin/prod/validate-coder', { coder }, function (data) {
+        $coderFeedback.text(data.coderTaken ? 'This code is already taken.' : '');
+      });
+    }
+
+    function checkReady() {
+      const ready = $catid.val() && $subcatid.val();
+      $addBtn.prop('disabled', !ready);
+    }
+
+    $catid.on('change', function () {
+      updateSubcategories();
+      checkReady();
+    });
+
+    $subcatid.on('change', function () {
+      checkReady();
+    });
+
+    $name.on('input blur', validateName);
+    $coder.on('input blur', validateCoder);
+
+    checkReady(); // Run once on page load
+  });
+
+  const imgInput = document.getElementById('img');
+  const preview = document.getElementById('preview');
+
+  imgInput.addEventListener('change', function () {
+    const file = this.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  });
+
+  $(document).ready(function () {
+    const $name = $('#name');
+    const $coder = $('#coder');
+    const $catid = $('#catid');
+    const $subcatid = $('#subcatid');
+    const $addBtn = $('#addBtn');
+
+    let nameValid = false;
+    let coderValid = false;
+
+    function toggleAddButton() {
+      $addBtn.prop('disabled', !(nameValid && coderValid));
+    }
+
+    function validateName() {
+      const name = $name.val().trim();
+      const catid = $catid.val();
+      const subcatid = $subcatid.val();
+
+      if (!name || !catid || !subcatid) {
+        $('#nameFeedback').text('');
+        nameValid = false;
+        toggleAddButton();
+        return;
+      }
+
+      $.post('/superadmin/prod/validate', { name, catid, subcatid }, function (data) {
+        if (data.nameTaken) {
+          $('#nameFeedback').text('Product name is already used under this category/subcategory.');
+          nameValid = false;
+        } else {
+          $('#nameFeedback').text('');
+          nameValid = true;
+        }
+        toggleAddButton();
+      });
+    }
+
+    function validateCoder() {
+      const coder = $coder.val().trim();
+      if (!coder) {
+        $('#coderFeedback').text('');
+        coderValid = false;
+        toggleAddButton();
+        return;
+      }
+
+      $.post('/superadmin/prod/validate-coder', { coder }, function (data) {
+        if (data.coderTaken) {
+          $('#coderFeedback').text('This product code is already taken.');
+          coderValid = false;
+        } else {
+          $('#coderFeedback').text('');
+          coderValid = true;
+        }
+        toggleAddButton();
+      });
+    }
+
+    $name.on('blur input', validateName);
+    $coder.on('blur input', validateCoder);
+    $catid.on('change', validateName);
+    $subcatid.on('change', validateName);
+  });
+
+</script>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  ClassicEditor
+    .create(document.querySelector('#dess'), {
+      toolbar: [
+        'heading', '|',
+        'bold', 'italic', 'underline', 'strikethrough', '|',
+        'link', 'blockQuote', '|',
+        'bulletedList', 'numberedList', '|',
+        'undo', 'redo'
+      ]
+    })
+    .then(editor => {
+      // Optional: manually set height via CSS
+      editor.ui.view.editable.element.style.minHeight = '250px';
+    })
+    .catch(error => {
+      console.error('🛠️ CKEditor init error:', error);
+    });
+</script>
+
+{{/section}}

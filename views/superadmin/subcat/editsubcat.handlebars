@@ -1,0 +1,91 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.css" rel="stylesheet" />
+<style>
+
+</style>
+
+
+{{/section}}
+
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h2 class="mb-4">Edit Subcategory</h2>
+
+      <form action="/superadmin/subcat/update/{{subcat._id}}?_method=PUT" method="POST" >
+        <input type="hidden" name="_method" value="PUT" />
+        <div>
+          <label for="catid">Category</label>
+          <select name="catid" id="catid" class="form-control searchable-cat" required>
+            {{#each cats}}
+              <option value="{{this._id}}" {{#ifEquals this._id ../subcat.catid}}selected{{/ifEquals}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+
+        <!-- Subcategory Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Subcategory Name</label>
+          <input type="text" name="name" id="name" class="form-control" required value="{{subcat.name}}" />
+          <div id="nameFeedback" class="form-text text-danger"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-4" id="updateBtn" disabled>Update</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#section "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+  const $name = $('#name');
+  const $catid = $('#catid');
+const $btn = $('#updateBtn').prop('disabled', false);
+  const $feedback = $('#nameFeedback');
+
+  $catid.select2({
+    placeholder: 'Select a category',
+    allowClear: true,
+    width: '100%',
+  });
+
+  let nameValid = true; // Allow submit on unchanged name
+
+  function toggleUpdateButton() {
+    $btn.prop('disabled', !nameValid);
+  }
+
+  function validate() {
+    const name = $name.val().trim();
+    const catid = $catid.val();
+    const subcatId = "{{subcat._id}}";
+
+    if (!name || !catid) {
+      $feedback.text('');
+      nameValid = false;
+  
+      return;
+    }
+
+    $.post(`/superadmin/subcat/validate-edit/${subcatId}`, { name, catid }, function (data) {
+      if (data.nameTaken) {
+        $feedback.text('Name is already taken under this category.');
+        nameValid = false;
+      } else {
+        $feedback.text('');
+        nameValid = true;
+      }
+      toggleUpdateButton();
+    });
+  }
+
+  $name.on('input blur', validate);
+  $catid.on('change', validate);
+});
+</script>
+{{/section}}

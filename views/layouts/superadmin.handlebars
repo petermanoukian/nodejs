@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{#if title}}{{title}} – Superadmin CMS{{else}}Superadmin CMS{{/if}}</title>
+
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+
+ {{#if _sections.styles}}
+    {{{_sections.styles}}}
+  {{/if}}
+
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/superadmin/dashboard">Superadmin Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#superadminNavbar" aria-controls="superadminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="superadminNavbar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Users -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Users
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="usersDropdown">
+            <li><a class="dropdown-item" href="/superadmin/register">Add</a></li>
+            <li><a class="dropdown-item" href="/superadmin/users">View</a></li>
+          </ul>
+        </li>
+
+        <!-- Categories -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+            <li><a class="dropdown-item" href="/superadmin/cat/new">Add</a></li>
+            <li><a class="dropdown-item" href="/superadmin/cat/view">View</a></li>
+          </ul>
+        </li>
+
+        <!-- Subcategories -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="subcategoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Subcategories
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="subcategoriesDropdown">
+            <li><a class="dropdown-item" href="/superadmin/subcat/new">Add</a></li>
+            <li><a class="dropdown-item" href="/superadmin/subcat/view">View</a></li>
+          </ul>
+        </li>
+
+        <!-- Products -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Products
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+            <li><a class="dropdown-item" href="/superadmin/prod/create">Add</a></li>
+            <li><a class="dropdown-item" href="/superadmin/prod/view">View</a></li>
+          </ul>
+        </li>
+
+        <!-- Tags -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="tagsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Tags
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
+            <li><a class="dropdown-item" href="/superadmin/tagg/create">Add</a></li>
+            <li><a class="dropdown-item" href="/superadmin/tagg/view">View</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- Right-aligned user menu -->
+
+<!-- Right-aligned user menu -->
+<ul class="navbar-nav ms-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="/uploads/{{user.profileImg}}" alt="Avatar" class="rounded-circle me-2" width="32" height="32" />
+      {{user.userName}}
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+      <li><a class="dropdown-item" href="/superadmin/profile/edit/{{user.id}}">Edit Profile</a></li>
+      <li><a class="dropdown-item" href="/logout">Logout</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    </div>
+  </div>
+</nav>
+
+
+
+  <main class="container mt-4">
+    {{{body}}}
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+{{#if _sections.scripts}}
+  {{{_sections.scripts}}}
+{{/if}}
+
+
+</body>
+</html>

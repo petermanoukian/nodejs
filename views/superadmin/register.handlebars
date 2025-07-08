@@ -1,0 +1,146 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+<h2 class="mb-4">Register New User from the handlebar template</h2>
+
+<form action="/superadmin/register/add" method="POST" enctype="multipart/form-data">
+  <!-- Full Name -->
+  <div class="mb-3">
+    <label for="fullName" class="form-label">Full Name</label>
+    <input type="text" name="fullName" id="fullName" class="form-control" required />
+  </div>
+
+<!-- Email -->
+<div class="mb-3">
+  <label for="email" class="form-label">Email</label>
+  <input type="email" name="email" id="email" class="form-control" required />
+  <div id="emailFeedback" class="form-text text-danger"></div>
+</div>
+
+<!-- Username -->
+<div class="mb-3">
+  <label for="username" class="form-label">Username</label>
+  <input type="text" name="username" id="username" class="form-control" required />
+  <div id="usernameFeedback" class="form-text text-danger"></div>
+</div>
+
+<!-- Password -->
+<div class="mb-3">
+  <label for="password" class="form-label">Password</label>
+  <input type="password" name="password" id="password" class="form-control" required />
+  <div id="passwordFeedback" class="form-text text-danger"></div>
+</div>
+
+
+  <!-- Role -->
+  <div class="mb-3">
+    <label for="roler" class="form-label">Role</label>
+    <select name="roler" id="roler" class="form-select" required>
+      <option value="ordinary">Ordinary</option>
+      <option value="admin">Admin</option>
+      <option value="superadmin">Superadmin</option>
+    </select>
+  </div>
+
+  <!-- Profile Image -->
+  <div class="mb-3">
+    <label for="img" class="form-label">Profile Image</label>
+    <input type="file" name="img" id="img" class="form-control" accept=".jpg,.jpeg,.png,.gif" />
+    <div class="mt-2">
+      <img id="preview" src="#" alt="Preview will appear here" style="max-width: 200px; display: none;" />
+    </div>
+  </div>
+
+  <!-- Optional Document -->
+  <div class="mb-3">
+    <label for="filer" class="form-label">Optional Document (image or doc)</label>
+    <input type="file" name="filer" id="filer" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt" />
+  </div>
+
+  <button type="submit" class="btn btn-primary mb-4" id="registerBtn" disabled>Add User</button>
+
+</form>
+ </div> </div> </div>
+
+{{#section "scripts"}}
+<script>
+$(document).ready(function () {
+  const $email = $('#email');
+  const $username = $('#username');
+  const $password = $('#password');
+  const $btn = $('#registerBtn');
+
+  let emailValid = false;
+  let usernameValid = false;
+  let passwordValid = false;
+
+  function toggleRegisterButton() {
+    $btn.prop('disabled', !(emailValid && usernameValid && passwordValid));
+  }
+
+  function validateFields() {
+    const email = $email.val().trim();
+    const username = $username.val().trim();
+    const password = $password.val().trim();
+
+    // Password length check
+    if (password.length > 0 && password.length < 6) {
+      $('#passwordFeedback').text('Password must be at least 6 characters.');
+      passwordValid = false;
+    } else {
+      $('#passwordFeedback').text('');
+      passwordValid = true;
+    }
+
+    // Live backend check
+    $.post('/superadmin/validate-user', { email, username }, function (data) {
+      if (data.emailTaken) {
+        $('#emailFeedback').text('Email is already taken.');
+        emailValid = false;
+      } else {
+        $('#emailFeedback').text('');
+        emailValid = true;
+      }
+
+      if (data.usernameTaken) {
+        $('#usernameFeedback').text('Username is already taken.');
+        usernameValid = false;
+      } else {
+        $('#usernameFeedback').text('');
+        usernameValid = true;
+      }
+
+      toggleRegisterButton();
+    });
+  }
+
+  $email.on('blur', validateFields);
+  $username.on('blur', validateFields);
+  $password.on('input', function () {
+    validateFields();
+  });
+});
+
+
+  const imgInput = document.getElementById('img');
+  const preview = document.getElementById('preview');
+
+  imgInput.addEventListener('change', function () {
+    const file = this.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  });
+</script>
+{{/section}}

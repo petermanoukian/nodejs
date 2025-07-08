@@ -1,0 +1,300 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <style>
+
+
+  </style>
+{{/section}}
+
+<h2 class="mb-4">Products</h2>
+
+{{#if success_msg}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{success_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+{{#if error_msg}}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{error_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+<form method="POST" action = '/superadmin/prod/view/' class="row g-2 align-items-center mb-4">
+  <div class="col-md-3">
+    <input type="text" name="q" value="{{searchQuery}}" placeholder="Search name/code" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <select name="catid" id="catid" class="form-select searchable-cat">
+      <option value="0">All Categories</option>
+      {{#each cats}}
+        <option value="{{this._id}}" {{#ifEquals ../catid this._id}}selected{{/ifEquals}}>{{this.name}}
+        
+       </option>
+      {{/each}}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="subcatid" id="subcatid" class="form-select searchable-subcat">
+      <option value="0">All Subcategories</option>
+      {{#each subcats}}
+        <option value="{{this._id}}" {{#ifEquals ../subcatid this._id}}selected{{/ifEquals}}>
+        {{this.name}} </option>
+      {{/each}}
+    </select>
+  </div>
+  <div class="col-md-4 d-flex">
+    <input type="number" name="minPrix" value="{{minPrix}}" placeholder="Min Price" 
+    class="form-control me-2" />
+    <input type="number" name="maxPrix" value="{{maxPrix}}" placeholder="Max Price" 
+    class="form-control me-2" />
+    <button type="submit" class="btn btn-outline-primary">Filter</button>
+  </div>
+</form>
+
+<form method="POST" action="/superadmin/prod/view/" class="row g-2 align-items-center mb-4">
+  <div class="col-md-10">
+    <label for="taggid">Filter by Tags</label>
+    <select name="taggid[]" id="taggid" class="form-select searchable-taggs" multiple>
+      {{#each taggs}}
+        <option value="{{this._id}}" {{#if (includes ../taggid this._id)}}selected{{/if}}>
+          {{this.name}}
+        </option>
+      {{/each}}
+    </select>
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <button type="submit" class="btn btn-outline-success w-100">Filter</button>
+  </div>
+</form>
+
+
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+      <th><input type="checkbox" id="selectAll" class="form-check-input" /></th>
+      <th>
+        <a href="?sort=_id&dir={{toggleDir sortField sortDir '_id'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Created {{#ifEquals sortField "_id"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=name&dir={{toggleDir sortField sortDir 'name'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Name {{#ifEquals sortField "name"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=coder&dir={{toggleDir sortField sortDir 'coder'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Code {{#ifEquals sortField "coder"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=catid&dir={{toggleDir sortField sortDir 'catid'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Category {{#ifEquals sortField "catid"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=subcatid&dir={{toggleDir sortField sortDir 'subcatid'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Subcategory {{#ifEquals sortField "subcatid"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=prix&dir={{toggleDir sortField sortDir 'prix'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Price {{#ifEquals sortField "prix"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=ordd&dir={{toggleDir sortField sortDir 'ordd'}}&q={{searchQuery}}&catid={{catid}}&subcatid={{subcatid}}">
+          Order {{#ifEquals sortField "ordd"}}{{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}{{else}}▲▼{{/ifEquals}}
+        </a>
+      </th>
+      <th>Image</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each prods}}
+      <tr>
+        <td><input type="checkbox" name="selected[]" value="{{this._id}}" class="delete-checkbox form-check-input" /></td>
+        <td class="font-12">{{formatShortIdDate this._id}}</td>
+        <td>{{this.name}}</td>
+        <td>{{this.coder}}</td>
+        <td>{{this.catid.name}}</td>
+        <td>{{this.subcatid.name}}</td>
+        <td>{{this.prix}}</td>
+        <td>{{this.ordd}}</td>
+
+        <td>
+       {{#ifBoth this.img.thumbnail this.img.large}}
+            <img src="/uploads/{{this.img.thumbnail}}" alt="Thumbnail" style="height: 60px; max-width: 90px;" />
+        {{else}}
+            <span class="text-muted">No image</span>
+        {{/ifBoth}}
+
+        {{#if this.filer}}
+        <hr>
+            <a href="/uploads/{{this.filer}}" target="_blank" class="text-decoration-none">File</a>
+        {{else}}
+           
+        {{/if}}
+        </td>
+
+
+
+        <td>
+          <a href="/superadmin/prod/create/{{this.catid._id}}/{{this.subcatid._id}}" class="btn btn-sm btn-outline-secondary me-1">
+            Add Product
+          </a>
+          <a href="/superadmin/prod/edit/{{this._id}}" class="btn btn-sm btn-outline-info">Edit</a>
+          <form action="/superadmin/prod/delete/{{this._id}}?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Delete this product?');">
+            <button type="submit" class="btn btn-outline-danger btn-sm p-0 px-2" style="width: 32px;">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </form>
+
+
+            {{#each this.relatedTaggs}}
+                <a href="/superadmin/tagg/edit/{{this.id}}" class="badge bg-secondary me-1">
+                  {{this.name}}
+                </a>
+              {{/each}}
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<form id="multiDeleteForm" action="/superadmin/prod/delete-many?_method=DELETE" method="POST" style="display: none;" onsubmit="return confirm('Delete selected products?');">
+  <input type="hidden" name="_method" value="DELETE" />
+  <div id="selectedContainer"></div>
+  <div class="text-center mb-3">
+    <button type="submit" class="btn btn-danger w-50 max400">
+      <i class="bi bi-trash-fill"></i> Delete Selected
+    </button>
+  </div>
+</form>
+
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {{#each (range 1 totalPages)}}
+      <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+        <a class="page-link" href="?page={{this}}&q={{../searchQuery}}&catid={{../catid}}&subcatid={{../subcatid}}&taggid={{../taggid}}&sort={{../sortField}}&dir={{../sortDir}}">{{this}}</a>
+      </li>
+    {{/each}}
+  </ul>
+</nav>
+
+{{#section "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const checkboxes = document.querySelectorAll('.delete-checkbox');
+  const form = document.getElementById('multiDeleteForm');
+  const container = document.getElementById('selectedContainer');
+  const selectAll = document.getElementById('selectAll');
+
+  function updateForm() {
+    container.innerHTML = '';
+    const selectedIds = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selectedIds.length > 0) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'selectedfinal';
+      input.value = selectedIds.join(',');
+      container.appendChild(input);
+      form.style.display = 'block';
+    } else {
+      form.style.display = 'none';
+    }
+  }
+
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateForm();
+    });
+  }
+
+  checkboxes.forEach(cb => cb.addEventListener('change', updateForm));
+});
+
+
+  $(document).ready(function () {
+        $('.searchable-cat').select2({
+        placeholder: 'All Categories',
+        allowClear: true,
+        width: '100%',
+        minimumResultsForSearch: Infinity // disables search for short lists but keeps empty
+        });
+
+        $('.searchable-subcat').select2({
+        placeholder: 'All Subcategories',
+        allowClear: true,
+        width: '100%',
+        minimumResultsForSearch: Infinity
+        });
+
+
+        $('#taggid').select2({
+          placeholder: 'Choose Taggs...',
+          width: '100%'
+        });
+
+
+  });
+
+
+$(document).ready(function () {
+  const $catid = $('#catid');
+  const $subcatid = $('#subcatid');
+  const presetCatId = '{{catid}}';
+  const presetSubcatId = '{{subcatid}}';
+
+  $('.searchable-cat').select2({ placeholder: 'Filter by category', allowClear: true, width: '100%' });
+  $('.searchable-subcat').select2({ placeholder: 'Filter by subcategory', allowClear: true, width: '100%' });
+
+  function updateSubcategories(preset = false) {
+    const selectedCatId = $catid.val();
+    /*
+    if (!selectedCatId) {
+      $subcatid.empty().append('<option value="0">All Subcategories</option>').val('').trigger('change');
+      return;
+    }
+    */
+    $.get(`/superadmin/subcat/api/subcats/${selectedCatId}`, function (options) {
+      $subcatid.empty().append('<option value="0">All Subcategories</option>');
+
+      options.forEach(opt => {
+        const isSelected = preset && (opt._id === presetSubcatId);
+        $subcatid.append(`<option value="${opt._id}" ${isSelected ? 'selected' : ''}>${opt.name}</option>`);
+      });
+
+      if (preset) {
+        $subcatid.val(presetSubcatId).trigger('change');
+      }
+    });
+  }
+
+  // 🔁 Initial prefill from query params if catid was present
+  if (presetCatId && presetSubcatId) {
+    updateSubcategories(true);
+  }
+
+  // 🔄 On category change
+  $catid.on('change', function () {
+    updateSubcategories(false);
+  });
+});
+
+
+</script>
+{{/section}}

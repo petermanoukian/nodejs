@@ -1,0 +1,254 @@
+{{#section "styles"}}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+{{/section}}
+
+
+<h2 class="mb-4">User List</h2>
+
+{{#if success_msg}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{success_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+{{#if error_msg}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{error_msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+
+<form method="GET" class="row g-2 align-items-center mb-4">
+  <div class="col-md-6">
+    <input type="text" name="q" value="{{searchQuery}}" placeholder="Search by name, email, or username" class="form-control" />
+  </div>
+  
+  <div class="col-md-3">
+    <select name="role" class="form-select" style="height: 38px;">
+      <option value="">All Roles</option>
+      <option value="superadmin" {{#ifEquals filterRole "superadmin"}}selected{{/ifEquals}}>Superadmin</option>
+      <option value="admin" {{#ifEquals filterRole "admin"}}selected{{/ifEquals}}>Admin</option>
+      <option value="ordinary" {{#ifEquals filterRole "ordinary"}}selected{{/ifEquals}}>Ordinary</option>
+    </select>
+  </div>
+  
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+  </div>
+</form>
+
+
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+
+      <th scope="col">
+        <input type="checkbox" id="selectAll" class="form-check-input" />
+      </th>
+
+      
+        <th scope="col">
+          <a 
+            href="?sort=_id&dir={{toggleDir sortField sortDir '_id'}}&q={{searchQuery}}&role={{filterRole}}">
+            Created
+            {{#ifEquals sortField "_id"}}
+              {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+            {{else}}
+              ▲▼
+            {{/ifEquals}}
+          </a>
+        </th>
+
+        
+        <th scope="col">
+            <a 
+            href="?sort=fullName&dir={{toggleDir sortField sortDir 'fullName'}}&q={{searchQuery}}&role={{filterRole}}">
+                Full Name
+                {{#ifEquals sortField "fullName"}}
+                {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+                {{else}}
+                ▲▼
+
+                {{/ifEquals}}
+            </a>
+        </th>
+        <th scope="col">
+            <a href="?sort=email&dir={{toggleDir sortField sortDir 'email'}}&q={{searchQuery}}&role={{filterRole}}">
+                Email
+                {{#ifEquals sortField "email"}}
+                {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+                {{else}}
+                    ▲▼
+                {{/ifEquals}}
+            </a>
+        </th>
+        <th scope="col">
+            <a href="?sort=username&dir={{toggleDir sortField sortDir 'username'}}&q={{searchQuery}}&role={{filterRole}}">
+                Username
+                {{#ifEquals sortField "username"}}
+                {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+                {{else}}
+                    ▲▼
+                {{/ifEquals}}
+            </a>
+        </th>
+
+
+        <th scope="col">
+            <a href="?sort=roler&dir={{toggleDir sortField sortDir 'roler'}}&q={{searchQuery}}&role={{filterRole}}">
+                Role
+                {{#ifEquals sortField "roler"}}
+                {{#ifEquals sortDir "asc"}}▲{{else}}▼{{/ifEquals}}
+                {{else}}
+                    ▲▼
+                {{/ifEquals}}
+            </a>
+        </th>
+        <th scope="col">Image</th>
+        <th scope="col">Actions</th>
+    </tr>
+
+  </thead>
+  <tbody>
+  {{#each users}}
+  {{!-- create an alias manually --}}
+  {{#with this as |userx|}}
+    <tr>
+
+    <td>
+      {{#if (notEquals userx._id @root.user.id)}}
+      <input type="checkbox" name="selected[]" value="{{userx._id}}" class="user-checkbox form-check-input" />
+      
+      
+      {{/if}}
+    </td>
+
+
+      <td class="font-12">{{formatShortIdDate userx._id}}</td>
+
+
+      <td>{{userx.fullName}}</td>
+      <td>{{userx.email}}</td>
+      <td>{{userx.username}}</td>
+      <td>{{userx.roler}}</td>
+
+      <td>
+        {{#if userx.img.thumbnail}}
+          {{#if userx.img.large}}
+            <a href="/uploads/{{userx.img.large}}" target="_blank">
+              <img src="/uploads/{{userx.img.thumbnail}}" alt="User" width="40" height="40" class="rounded-circle border" />
+            </a>
+          {{else}}
+            <img src="/uploads/{{userx.img.thumbnail}}" alt="User" width="40" height="40" class="rounded-circle border" />
+          {{/if}}
+        {{/if}}
+      </td>
+
+
+
+      <td>
+        <a href="/superadmin/user/edit/{{userx._id}}" class="btn btn-sm btn-outline-info">Edit</a>
+
+
+      {{#if (notEquals userx._id @root.user.id)}}
+        <form action="/superadmin/user/delete/{{userx._id}}?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
+          <button type="submit" class="btn btn-outline-danger btn-sm p-0 px-2" style="width: 32px;" title="Delete">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </form>
+
+
+      {{/if}}
+
+      </td>
+    </tr>
+  {{/with}}
+{{/each}}
+
+  </tbody>
+</table>
+
+
+<form id="multiDeleteForm" action="/superadmin/user/delete-many?_method=DELETE" method="POST" 
+style="display: none;" onsubmit="return confirm('Are you sure you want to delete the selected users?');">
+  <input type="hidden" name="_method" value="DELETE" />
+   
+  <div id="selectedContainer"></div>
+  <div class="text-center mb-3">
+    <button type="submit" class="btn btn-danger w-50 max400">
+      <i class="bi bi-trash-fill"></i> Delete Selected
+    </button>
+  </div>
+</form>
+
+
+
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {{#each (range 1 totalPages)}}
+      <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+        <a class="page-link" href="?page={{this}}&q={{../searchQuery}}&role={{../filterRole}}&sort={{../sortField}}&dir={{../sortDir}}">{{this}}</a>
+      </li>
+    {{/each}}
+  </ul>
+</nav>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const checkboxes = document.querySelectorAll('.user-checkbox');
+  const form = document.getElementById('multiDeleteForm');
+  const container = document.getElementById('selectedContainer');
+  const selectAll = document.getElementById('selectAll');
+
+  function updateForm() {
+  container.innerHTML = '';
+  let selectedCount = 0;
+  let debugMsg = "";
+  const selectedIds = []; // ✅ Build this first
+
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      selectedCount++;
+      selectedIds.push(cb.value);
+      debugMsg += `✔️ ${cb.value}\n`;
+    }
+  });
+
+  // ✅ Only create one input to hold the final list
+  if (selectedIds.length > 0) {
+    const input = document.createElement('input');
+    input.type = 'hidden'; // for debugging, can change to 'hidden' later
+    input.name = 'selectedfinal';
+    input.value = selectedIds.join(',');
+    container.appendChild(input);
+  }
+
+  form.style.display = selectedCount > 0 ? 'block' : 'none';
+
+  if (selectedCount > 0) {
+    //alert(`Selected COUNT ${selectedCount} users:\n${debugMsg}`);
+  } else {
+    //alert('❌ No checkboxes are currently checked');
+  }
+}
+
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateForm();
+    });
+  }
+
+  checkboxes.forEach(cb => cb.addEventListener('change', updateForm));
+
+  form.addEventListener("submit", (e) => {
+    //alert("🚨 Form is being submitted with selectedfinal[] populated.");
+  });
+});
+</script>

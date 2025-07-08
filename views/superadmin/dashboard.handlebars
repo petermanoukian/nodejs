@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <div class="alert alert-success text-center">
+    <h2 class="mb-3">Welcome, {{user.userName}}!</h2>
+    <p><strong>Full Name:</strong> {{user.fullName}}</p>
+    <p><strong>Email:</strong> {{user.email}}</p>
+    <p><strong>Roler:</strong> {{user.roler}}</p>
+    <p><strong>User ID:</strong> {{user.id}}</p>
+
+    {{#if user.profileImg}}
+      <div class="mb-3">
+        <strong>Thumbnail:</strong><br />
+        <img src="/uploads/{{user.profileImg}}" alt="Thumbnail" width="100" class="rounded border" />
+      </div>
+    {{/if}}
+
+    {{#if user.profileImgLarge}}
+      <div class="mb-3">
+        <strong>Large Image:</strong><br />
+        <img src="/uploads/{{user.profileImgLarge}}" alt="Large Image" width="250" class="rounded border" />
+      </div>
+    {{/if}}
+
+    {{#if user.filer}}
+      <p>
+        <strong>Attached Document:</strong><br />
+        <a href="/uploads/{{user.filer}}" target="_blank" class="btn btn-outline-primary btn-sm">
+          Open Document
+        </a>
+      </p>
+    {{/if}}
+
+    <form action="/logout" method="GET" class="text-end mt-4">
+      <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+  </div>
+</div>
