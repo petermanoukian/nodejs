@@ -115,10 +115,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI, // ✅ this is the fix
+    mongoUrl: process.env.MONGO_URI || 'mongodb+srv://bediktest:psrdmquVBDYpoaL7@cluster0.xrmcva2.mongodb.net/express_auth?retryWrites=true&w=majority',
     dbName: 'express_auth',
     collectionName: 'sessions',
-    ttl: 30 * 24 * 60 * 60
+    ttl: 30 * 24 * 60 * 60 // 30 days
   }),
   cookie: {
     secure: false,
@@ -126,6 +126,7 @@ app.use(session({
     maxAge: 30 * 24 * 60 * 60 * 1000
   }
 }));
+
 
 
 app.use(express.urlencoded({ extended: true }));
