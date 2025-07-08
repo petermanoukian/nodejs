@@ -109,11 +109,17 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/express_aut
 
 connectDB();
 
-const mongoClientPromise = new Promise((resolve) => {
+const mongoClientPromise = new Promise((resolve, reject) => {
   mongoose.connection.once('connected', () => {
-    resolve(mongoose.connection.getClient());
+    try {
+      const client = mongoose.connection.getClient();
+      resolve(client);
+    } catch (err) {
+      reject(err);
+    }
   });
 });
+
 
 
 app.use(session({
