@@ -66,6 +66,9 @@ app.engine('handlebars', exphbs.engine({
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
+app.set('trust proxy', 1);
+
+
 // DB connection
 connectDB().then(() => {
   // Use `mongoUrl` (recommended over `client`)
@@ -115,7 +118,7 @@ connectDB().then(() => {
 
   // Start server
   app.listen(port, () => {
-    console.log(`🚀 Server is running at http://localhost:${port}`);
+    console.log(`🚀 Server is running at https://nodejs-1i3v.onrender.com:${port}`);
   });
 }).catch((err) => {
   console.error('❌ Failed to connect to DB or start server:', err);

@@ -105,8 +105,6 @@ const logout = (req, res) => {
   });
 };
 
-
-
 module.exports = {
   renderLoginForm,
   processSignin,
