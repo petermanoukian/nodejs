@@ -37,13 +37,18 @@
         <!-- Role -->
         <div class="mb-3">
           <label for="roler" class="form-label">Role</label>
-            <select name="roler" id="roler" class="form-select" required>
-            <option value="ordinary" {{#ifEquals userx.roler "ordinary"}}selected{{/ifEquals}}>Ordinary</option>
-            <option value="admin" {{#ifEquals userx.roler "admin"}}selected{{/ifEquals}}>Admin</option>
-            <option value="superadmin" {{#ifEquals userx.roler "superadmin"}}selected{{/ifEquals}}>Superadmin</option>
-            </select>
 
+          {{#ifEquals userx._id @root.user.id}}
+            <input type="text" class="form-control" name="roler" value="{{userx.roler}}" readonly />
+          {{else}}
+            <select name="roler" id="roler" class="form-select" required>
+              <option value="ordinary" {{#ifEquals userx.roler "ordinary"}}selected{{/ifEquals}}>Ordinary</option>
+              <option value="admin" {{#ifEquals userx.roler "admin"}}selected{{/ifEquals}}>Admin</option>
+              <option value="superadmin" {{#ifEquals userx.roler "superadmin"}}selected{{/ifEquals}}>Superadmin</option>
+            </select>
+          {{/ifEquals}}
         </div>
+
 
         <div class="mb-3">
           <label for="img" class="form-label">Profile Image</label>
